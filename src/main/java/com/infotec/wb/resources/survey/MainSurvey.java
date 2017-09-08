@@ -271,8 +271,8 @@ public class MainSurvey extends GenericResource
         try
         {
             super.setResourceBase(base);
-            webpath = (String)SWBPlatform.getContextPath();
-            workpath = (String)SWBPortal.getWebWorkPath() + base.getWorkPath();
+            webpath = SWBPlatform.getContextPath();
+            workpath = SWBPortal.getWebWorkPath() + "/" + base.getWorkPath();
         }
         catch(Exception e)
         {
@@ -284,7 +284,7 @@ public class MainSurvey extends GenericResource
 
             try
             {
-                tpl=SWBUtils.XML.loadTemplateXSLT(SWBUtils.IO.getStreamFromString(SWBUtils.IO.getFileFromPath(SWBPortal.getWorkPath()+base.getWorkPath() + "/" + base.getAttribute("template").trim())));
+                tpl=SWBUtils.XML.loadTemplateXSLT(SWBUtils.IO.getStreamFromString(SWBUtils.IO.getFileFromPath(SWBPortal.getWorkPath()+ "/" +base.getWorkPath() + "/" + base.getAttribute("template").trim())));
                 base.setAttribute("path", workpath + "/");
                 trans = tpl.newTransformer();
             }
@@ -307,7 +307,7 @@ public class MainSurvey extends GenericResource
                 log.error("Error while loading default resource template: "+base.getId(), e);
             }
         }
-        if("".equals(base.getAttribute("path", "").trim())) base.setAttribute("path", webpath + "swbadmin/xsl/MainSurvey/");
+        if("".equals(base.getAttribute("path", "").trim())) base.setAttribute("path", webpath + "/swbadmin/xsl/MainSurvey/");
         
 //        /*Inicializa el documento xml*/
 //        try

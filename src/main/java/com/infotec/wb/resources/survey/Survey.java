@@ -281,7 +281,7 @@ public class Survey
                     tempS = tempS.substring(tempS.lastIndexOf("\\")+1,tempS.length());
                     String Otype=base.getResourceType().getId();
                     //RecResourceType recobj = DBResourceType.getInstance().getResourceType(paramsRequest.getTopic().getMap().getId(),Otype);
-                    String RutaGuardaTemplate = SWBPortal.getWorkPath()+base.getWorkPath(); //WBUtils.getInstance().getWorkPath()+"/sites/"+paramsRequest.getTopic().getMap().getId()+"/resources/"+recobj.getName()+"/";
+                    String RutaGuardaTemplate = SWBPortal.getWorkPath()+"/"+base.getWorkPath(); //WBUtils.getInstance().getWorkPath()+"/sites/"+paramsRequest.getTopic().getMap().getId()+"/resources/"+recobj.getName()+"/";
                     File f=new File(RutaGuardaTemplate);
                     if(!f.exists())
                         f.mkdirs();
@@ -878,11 +878,10 @@ public class Survey
 
                     tempS=base.getAttribute("template","");
                     ret.append("\n<tr><td  width=\"200\" align=\"right\">&nbsp;</td>");
-                    if (base.getAttribute("path").indexOf(base.getWorkPath()) !=-1){
-                        ret.append("<td >"+paramsRequest.getLocaleString("usrmsg_Survey_getAdmHtml_msgActual")+" <a href=\"" + base.getAttribute("path") + tempS +"\">"+tempS+"</a></tr>");
-                    }
-                    else{
-                        ret.append("<td >"+paramsRequest.getLocaleString("usrmsg_Survey_getAdmHtml_msgPlantillaDefecto")+" <a href=\""+ base.getAttribute("path") + "MainSurvey.xsl\">MainSurvey.xsl</a></tr>");
+                    if (base.getAttribute("path").contains(base.getWorkPath())) {
+                        ret.append(("<td >"+paramsRequest.getLocaleString("usrmsg_Survey_getAdmHtml_msgActual")+" <a href=\"" + SWBPlatform.getContextPath() + "/showfile?file=" + base.getWorkPath() + "/" + tempS +"&pathType=res&resUri=" + base.getSemanticObject().getEncodedURI() + "\">"+tempS+"</a></td></tr>"));
+                    } else {
+                        ret.append(("<td >"+paramsRequest.getLocaleString("usrmsg_Survey_getAdmHtml_msgPlantillaDefecto")+" <a href=\""+ SWBPlatform.getContextPath() + "/showfile?file=" + base.getAttribute("path") + "MainSurvey.xsl&pathType=def\">MainSurvey.xsl</a></td></tr>"));
                     }
                     ret.append("\n<tr><td  width=\"200\" align=\"right\">" +paramsRequest.getLocaleString("usrmsg_Survey_getAdmHtml_msgTemplate")+":</td>");
                     ret.append("<td><input type=\"file\" name=\"ftemplate\" size=\"37\"><input type=\"hidden\" name=\"ptemplate\" value=0><input type=\"hidden\" name=\"current_template\" value=\""+tempS+"\"></td></tr>");
@@ -978,8 +977,8 @@ public class Survey
                 ret.append("\n<tr><td  width=\"200\" align=\"right\">"+paramsRequest.getLocaleString("usrmsg_Survey_getAdmHtml_msgTimeAnswer")+":</td>");
                 ret.append("<td ><input type=\"text\" name=\"timeanswer\" value=\"\" size=\"3\" maxlength=3>&nbsp;<input type=\"checkbox\" id=\"unlimited_time\" name=\"unlimited_time\" value=\"1\" onclick=\"javascript: doBlockTime(forma);\">&nbsp;"+paramsRequest.getLocaleString("usrmsg_Survey_getAdmHtml_msgTiempoIlimitado")+"</td>");
                 ret.append("</tr>");
-                ret.append("\n<tr><td  width=\"200\" align=\"right\">&nbsp;</td><td >"+paramsRequest.getLocaleString("usrmsg_Survey_getAdmHtml_msgPlantillaDefecto")+" <a href=\""+ base.getAttribute("path") + "MainSurvey.xsl\">MainSurvey.xsl</a></td></tr>");
-                ret.append("\n<tr><td  width=\"200\" align=\"right\">"+paramsRequest.getLocaleString("usrmsg_Survey_getAdmHtml_msgTemplate")+":</td><td ><input type=\"hidden\" name=\"ptemplate\" value=0><input type=\"hidden\" name=\"current_template\" value=\"\"><input type=\"file\" name=\"ftemplate\"  size=\"45\" ></td></tr>");
+                ret.append(("\n<tr><td  width=\"200\" align=\"right\">&nbsp;</td><td>"+paramsRequest.getLocaleString("usrmsg_Survey_getAdmHtml_msgPlantillaDefecto")+" <a href=\"" + SWBPlatform.getContextPath() + "/showfile?file=" + base.getAttribute("path") + "MainSurvey.xsl&pathType=def\">MainSurvey.xsl</a></td></tr>"));
+                ret.append("\n<tr><td  width=\"200\" align=\"right\">"+paramsRequest.getLocaleString("usrmsg_Survey_getAdmHtml_msgTemplate")+":</td><td ><input type=\"hidden\" name=\"ptemplate\" value=0><input type=\"hidden\" name=\"current_template\" value=\"\"><input type=\"file\" name=\"ftemplate\" size=\"45\"></td></tr>");
                 ret.append("\n<tr><td  width=\"200\" align=\"right\">"+paramsRequest.getLocaleString("usrmsg_Survey_getAdmHtml_msgPaginaRedireccionamiento")+":</td><td ><input type=\"text\" name=\"url_response\" value=\"\" size=\"60\" maxlength=200></td></tr>");
                 ret.append("\n<tr><td  width=\"200\" align=\"right\">"+paramsRequest.getLocaleString("usrmsg_Survey_getAdmHtml_msgMostrarPendientes")+":</td><td ><input type=\"checkbox\" name=\"show_pending\" value=\"1\"></td></tr>");
                 ret.append("\n<tr><td  width=\"200\" align=\"right\">"+paramsRequest.getLocaleString("usrmsg_Survey_getAdmHtml_msgAnonimo")+":</td><td ><input type=\"checkbox\" name=\"anonimo\" value=\"1\"  onclick=\"deshabilita(forma);\"></td></tr>");
