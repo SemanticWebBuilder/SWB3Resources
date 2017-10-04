@@ -96,6 +96,7 @@ public class DataBaseResource extends GenericResource
                     tpl = SWBUtils.XML.loadTemplateXSLT(SWBPortal.getFileFromWorkPath(base.getWorkPath() +"/"+ base.getAttribute("filex")));
                     //tpl = SWBUtils.XML.loadTemplateXSLT(SWBUtils.IO.getStreamFromString(SWBUtils.IO.getFileFromPath(base.getWorkPath() +"/"+ base.getAttribute("filex"))));
                     base.setAttribute("path", SWBPortal.getWebWorkPath() +  base.getWorkPath() + "/");
+                    base.setAttribute("format", "2");
                 }
                 catch(Exception e) 
                 { 
@@ -145,7 +146,7 @@ public class DataBaseResource extends GenericResource
                 }
             }
         }
-        if ("".equals(base.getAttribute("path", "").trim())) base.setAttribute("path", SWBPlatform.getContextPath() + "swbadmin/xsl/DataBaseResource/");
+        if ("".equals(base.getAttribute("path", "").trim())) base.setAttribute("path", SWBPlatform.getContextPath() + "/swbadmin/xsl/DataBaseResource/");
     }
 
 
@@ -293,18 +294,20 @@ public class DataBaseResource extends GenericResource
                                 {
                                     if ("consulta".equals(queryType)) 
                                     {
-                                        applet = resUtil.uploadFileParsed(base, requestparams, "filex", request.getSession().getId());
+                                        //applet = resUtil.uploadFileParsed(base, requestparams, "filex", request.getSession().getId());
+                                        if (resUtil.uploadFile(base, requestparams, "filex")) {
                                         /*
                                         if (applet != null && !applet.trim().equals(""))*/
-                                        base.setAttribute("filex", file);
-                                        //else base.setAttribute("msgadmin", paramRequest.getLocaleString("usrmsg_DataBaseResource_doAdmin_msgWrongChangeFile") +" <i>" + value + "</i>.");
+                                            base.setAttribute("filex", file);
+                                        }
+                                        else base.setAttribute("msgadmin", paramRequest.getLocaleString("usrmsg_DataBaseResource_doAdmin_msgWrongChangeFile") +" <i>" + value + "</i>.");
                                     }
                                     else
                                     {
                                         //if (WBResourceUtils.getInstance().uploadFile(base, fUpload, "filex"))
-                                        if (resUtil.uploadFile(base, requestparams, "filex"))
+                                        if (resUtil.uploadFile(base, requestparams, "filex")) {
                                             base.setAttribute("filex", file);
-                                        else base.setAttribute("msgadmin", paramRequest.getLocaleString("usrmsg_DataBaseResource_doAdmin_msgWrongChangeFile") +" <i>" + value + "</i>.");
+                                        } else base.setAttribute("msgadmin", paramRequest.getLocaleString("usrmsg_DataBaseResource_doAdmin_msgWrongChangeFile") +" <i>" + value + "</i>.");
                                     }
                                 }
                             }
@@ -331,10 +334,11 @@ public class DataBaseResource extends GenericResource
                                 else
                                 {
                                     //applet = WBResourceUtils.getInstance().uploadFileParsed(base, fUpload, "template", request.getSession().getId());
-                                    applet = resUtil.uploadFileParsed(base, requestparams, "template", request.getSession().getId());
-                                    if (applet != null && !applet.trim().equals(""))
+                                    if (resUtil.uploadFile(base, requestparams, "template")) {
+//                                    applet = resUtil.uploadFileParsed(base, requestparams, "template", request.getSession().getId());
+//                                    if (applet != null && !applet.trim().equals(""))
                                         base.setAttribute("template", file);
-                                    else base.setAttribute("msgadmin", base.getAttribute("msgadmin","")+"<br>"+paramRequest.getLocaleString("usrmsg_DataBaseResource_doAdmin_msgWrongChangeFile") +" <i>" + value + "</i>.");
+                                    } else base.setAttribute("msgadmin", base.getAttribute("msgadmin","")+"<br>"+paramRequest.getLocaleString("usrmsg_DataBaseResource_doAdmin_msgWrongChangeFile") +" <i>" + value + "</i>.");
                                 }
                             }
                             else base.setAttribute("msgadmin", base.getAttribute("msgadmin","")+"<br>"+paramRequest.getLocaleString("usrmsg_DataBaseResource_doAdmin_msgWrongChangeFile") +" <i>" + value + "</i>.");
@@ -355,10 +359,11 @@ public class DataBaseResource extends GenericResource
                                     if (!resUtil.isFileType(file, "xsl|xslt"))
                                         base.setAttribute("msgadmin", base.getAttribute("msgadmin","")+"<br>"+paramRequest.getLocaleString("usrmsg_DataBaseResource_doAdmin_msgNoExtensionSopported") +" <i>xsl, xslt</i>: " + file+".");
                                     else {
-                                        applet = resUtil.uploadFileParsed(base, requestparams, "tplq", request.getSession().getId());
-                                        if (applet != null && !applet.trim().equals(""))
+                                        if (resUtil.uploadFile(base, requestparams, "tplq")) {
+//                                        applet = resUtil.uploadFileParsed(base, requestparams, "tplq", request.getSession().getId());
+//                                        if (applet != null && !applet.trim().equals(""))
                                             base.setAttribute("tplq", file);
-                                        else 
+                                        } else 
                                             base.setAttribute("msgadmin", base.getAttribute("msgadmin","")+"<br>"+paramRequest.getLocaleString("usrmsg_DataBaseResource_doAdmin_msgWrongChangeFile") +" <i>" + value + "</i>.");
                                     }
                                 }
@@ -783,11 +788,20 @@ public class DataBaseResource extends GenericResource
             ret.append("<input type=file size=40 name=filex onChange=\"isFileType(this, 'xsl|xslt');\" onClick=\"document.frmResource.format[2].checked=true;\"> \n");
             ret.append("</td> \n");
             ret.append("</tr> \n"); 
+            ret.append("<tr><td>&nbsp;</td> \n");
+            ret.append("<td class=\"valores\">"+ paramRequest.getLocaleString("usrmsg_DataBaseResource_doAdmin_defaultTemplate"));
+            ret.append(" <a href=\"");
+            ret.append(SWBPlatform.getContextPath());
+            ret.append("/showfile?file=/swbadmin/xsl/DataBaseResource/DataBaseResource_query.xslt&pathType=def\">DataBaseResource_query.xslt</a>");
+            ret.append("</td></tr> \n");
             if ("2".equals(value))
             {
                 ret.append("<tr><td></td> \n");
                 ret.append("<td class=\"valores\">"+ paramRequest.getLocaleString("usrmsg_DataBaseResource_doAdmin_fileConfig") +" ");
-                ret.append("<a href=\""+ webWorkPath +"/"+ base.getAttribute("filex") +"\">" + base.getAttribute("filex") + "</a>");
+                ret.append("<a href=\"");
+                ret.append(SWBPlatform.getContextPath());
+                ret.append("/showfile?file=");
+                ret.append(webWorkPath +"/"+ base.getAttribute("filex") +"\">" + base.getAttribute("filex") + "</a>");
                 ret.append("</td></tr> \n");
                 ret.append("<tr><td></td> \n");
                 ret.append("<td class=\"valores\"><input type=checkbox name=nofilex value=1 onClick=\"if(this.checked==true) this.form.submit();\"> ");
@@ -918,7 +932,7 @@ public class DataBaseResource extends GenericResource
      */       
     private String getUpdateForm(HttpServletRequest request, SWBParamRequest paramRequest)
     {
-        StringBuffer ret=new StringBuffer("");
+        StringBuffer ret=new StringBuffer(216);
         Resource base=getResourceBase();
         try
         {
@@ -934,7 +948,7 @@ public class DataBaseResource extends GenericResource
                 {
                     ret.append("<tr><td></td> \n");
                     ret.append("<td class=\"valores\">"+ paramRequest.getLocaleString("usrmsg_DataBaseResource_doAdmin_fileConfig") +" ");
-                    ret.append("<a href=\""+ webWorkPath +"/"+ base.getAttribute("filex").trim() +"\">" + base.getAttribute("filex").trim() + "</a>");
+                    ret.append("<a href=\"" + SWBPlatform.getContextPath() + "/showfile?file=" + webWorkPath + "/" + base.getAttribute("filex").trim() + "&pathType=def\">" + base.getAttribute("filex").trim() + "</a>");
                     ret.append("</td></tr> \n");
                     ret.append("<tr><td></td> \n");
                     ret.append("<td class=\"valores\"><input type=checkbox name=nofilex value=1 onClick=\"if(this.checked==true) this.form.submit();\"> ");
@@ -951,7 +965,7 @@ public class DataBaseResource extends GenericResource
                 {
                     ret.append("<tr><td></td> \n");
                     ret.append("<td class=\"valores\">"+ paramRequest.getLocaleString("usrmsg_DataBaseResource_doAdmin_fileConfig") +" ");
-                    ret.append("<a href=\""+ webWorkPath +"/"+ base.getAttribute("template").trim() +"\">" + base.getAttribute("template").trim() + "</a>");
+                    ret.append("<a href=\"" + SWBPlatform.getContextPath() + "/showfile?file=" + webWorkPath + "/" + base.getAttribute("template").trim() +"&pathType=def\">" + base.getAttribute("template").trim() + "</a>");
                     ret.append("</td></tr> \n");
                     ret.append("<tr><td></td> \n");
                     ret.append("<td class=\"valores\"><input type=checkbox name=notemplate value=1 onClick=\"if(this.checked==true) this.form.submit();\"> ");
@@ -960,7 +974,7 @@ public class DataBaseResource extends GenericResource
                 }else {
                     ret.append("<tr><td></td> \n");
                     ret.append("<td class=\"valores\">"+ paramRequest.getLocaleString("msgDefaultTemplate") +" ");
-                    ret.append("<a href=\""+ SWBPlatform.getContextPath() + "Swbadmin/xsl/DataBaseResource/DataBaseResource_"+base.getAttribute("queryType","")+".xslt\">DataBaseResource_"+base.getAttribute("queryType","")+".xslt</a>");
+                    ret.append("<a href=\""+ SWBPlatform.getContextPath() + "/showfile?file=/swbadmin/xsl/DataBaseResource/DataBaseResource_"+base.getAttribute("queryType","")+".xslt&pathType=def\">DataBaseResource_"+base.getAttribute("queryType","")+".xslt</a>");
                     ret.append("</td></tr> \n");
                 }
                 /*ret.append("<tr> \n");
@@ -1088,7 +1102,7 @@ public class DataBaseResource extends GenericResource
                 {
                     ret.append("<tr><td></td> \n");
                     ret.append("<td class=\"valores\">"+ paramRequest.getLocaleString("usrmsg_DataBaseResource_doAdmin_fileConfig") +" ");
-                    ret.append("<a href=\""+ webWorkPath +"/"+ base.getAttribute("filex").trim() +"\">" + base.getAttribute("filex").trim() + "</a>");
+                    ret.append("<a href=\"" + SWBPlatform.getContextPath() + "/showfile?file=" + webWorkPath + "/" + base.getAttribute("filex").trim() + "&pathType=res\">" + base.getAttribute("filex").trim() + "</a>");
                     ret.append("</td></tr> \n");
                     ret.append("<tr><td></td> \n");
                     ret.append("<td class=\"valores\"><input type=checkbox name=nofilex value=1 onClick=\"if(this.checked==true) this.form.submit();\"> ");
@@ -1105,7 +1119,7 @@ public class DataBaseResource extends GenericResource
                 {
                     ret.append("<tr><td></td> \n");
                     ret.append("<td class=\"valores\">"+ paramRequest.getLocaleString("usrmsg_DataBaseResource_doAdmin_fileConfig") +" ");
-                    ret.append("<a href=\""+ webWorkPath +"/"+ base.getAttribute("template").trim() +"\">" + base.getAttribute("template").trim() + "</a>");
+                    ret.append("<a href=\"" + SWBPlatform.getContextPath() + "/showfile?file=" + webWorkPath + "/" + base.getAttribute("template").trim() +"&pathType=res\">" + base.getAttribute("template").trim() + "</a>");
                     ret.append("</td></tr> \n");
                     ret.append("<tr><td></td> \n");
                     ret.append("<td class=\"valores\"><input type=checkbox name=notemplate value=1 onClick=\"if(this.checked==true) this.form.submit();\"> ");
@@ -1116,7 +1130,7 @@ public class DataBaseResource extends GenericResource
                 {
                     ret.append("<tr><td></td> \n");
                     ret.append("<td class=\"valores\">"+ paramRequest.getLocaleString("msgDefaultTemplate") +" ");
-                    ret.append("<a href=\""+ SWBPortal.getWorkPath() + "swbadmin/xsl/DataBaseResource/DataBaseResource_"+base.getAttribute("queryType","")+".xslt\">DataBaseResource_"+base.getAttribute("queryType","")+".xslt</a>");
+                    ret.append("<a href=\""+ SWBPlatform.getContextPath() + "/showfile?file=/swbadmin/xsl/DataBaseResource/DataBaseResource_" + base.getAttribute("queryType","") + ".xslt&pathType=def\">DataBaseResource_" + base.getAttribute("queryType","") + ".xslt</a>");
                     ret.append("</td></tr> \n");
                 }
                 if ("search".equals(base.getAttribute("queryType"))) {
@@ -1129,7 +1143,7 @@ public class DataBaseResource extends GenericResource
                     if (!"".equals(base.getAttribute("tplq","").trim())) {
                         ret.append("<tr><td></td> \n");
                         ret.append("<td class=\"valores\">"+ paramRequest.getLocaleString("usrmsg_DataBaseResource_doAdmin_fileConfig") +" ");
-                        ret.append("<a href=\""+ webWorkPath +"/"+ base.getAttribute("tplq").trim() +"\">" + base.getAttribute("tplq").trim() + "</a>");
+                        ret.append("<a href=\"" + SWBPlatform.getContextPath() + "/showfile?file=" + webWorkPath + "/" + base.getAttribute("tplq").trim() +"&pathType=res\">" + base.getAttribute("tplq").trim() + "</a>");
                         ret.append("</td></tr> \n");
                         ret.append("<tr><td></td> \n");
                         ret.append("<td class=\"valores\"><input type=checkbox name=notplq value=1 onClick=\"if(this.checked==true) this.form.submit();\"> ");
@@ -1139,7 +1153,7 @@ public class DataBaseResource extends GenericResource
                     else {
                         ret.append("<tr><td></td> \n");
                         ret.append("<td class=\"valores\">"+ paramRequest.getLocaleString("msgDefaultTemplate") +" ");
-                        ret.append("<a href=\""+ SWBPortal.getWorkPath() + "swbadmin/xsl/DataBaseResource/DataBaseResource_query.xslt\">DataBaseResource_query.xslt</a>");
+                        ret.append("<a href=\""+ SWBPlatform.getContextPath() + "/showfile?file=/swbadmin/xsl/DataBaseResource/DataBaseResource_query.xslt&pathType=def\">DataBaseResource_query.xslt</a>");
                         ret.append("</td></tr> \n");
                     }
                 }
